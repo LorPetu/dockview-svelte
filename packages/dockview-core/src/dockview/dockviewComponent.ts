@@ -5783,14 +5783,9 @@ export class DockviewComponent
                     const sourceLocation = getGridLocation(sourceGroup.element);
                     const [sourceParentLocation, from] = tail(sourceLocation);
 
-                    // A sole-tab group dropped beside a sibling in its own
-                    // branch is a reorder: `moveView` shifts it along the
-                    // branch and every group keeps its size. Under
-                    // `dropSizing: 'distribute'` a reorder re-shares the
-                    // branch like any other drop, so fall through to the
-                    // detach-and-re-add path below, which sizes the group
-                    // through `sizingForDrop`. A drop on the group's own edge
-                    // moves nothing, so it always takes the `moveView` no-op.
+                    // Under 'distribute' a sibling reorder re-shares the
+                    // branch like any other drop, so skip the size-preserving
+                    // moveView unless the drop is on the group's own edge.
                     if (
                         (this.options.dropSizing !== 'distribute' ||
                             sourceGroup === destinationGroup) &&
@@ -5799,6 +5794,9 @@ export class DockviewComponent
                             targetParentLocation
                         )
                     ) {
+                        // special case when 'swapping' two views within same grid location
+                        // if a group has one tab - we are essentially moving the 'group'
+                        // which is equivalent to swapping two views in this case
                         this.gridview.moveView(sourceParentLocation, from, to);
 
                         this.fireDidMovePanel(
@@ -6396,8 +6394,7 @@ export class DockviewComponent
                     target
                 );
 
-                // Default sizing preserves a sibling reorder's own size.
-                // Other moves follow the configured drop sizing strategy.
+                // A reorder keeps its own size unless drops distribute.
                 let size: number | Sizing;
 
                 if (
@@ -6656,8 +6653,8 @@ export class DockviewComponent
     }
 
     /**
-     * A drop either shares the destination branch evenly or halves the target
-     * group. Gridview rewrites the index to 0 when a cross-axis drop wraps the
+     * Sizing for a group created by a drop next to `referenceLocation`.
+     * Gridview rewrites the index to 0 when a cross-axis drop wraps the
      * reference in a new branch, so one split index serves both paths.
      */
     private sizingForDrop(referenceLocation: number[]): Sizing {

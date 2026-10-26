@@ -446,11 +446,8 @@ export interface DockviewOptions {
      */
     dndCompass?: boolean | { zones?: Position[]; edges?: boolean };
     /**
-     * Size groups after a panel or group is dropped on a group's edge.
-     * `split` (default) halves the target group, or preserves sizes when
-     * reordering sibling groups.
-     * `distribute` shares the row or column evenly, subject to size constraints.
-     * Applies to subsequent drops; changing it does not resize existing groups.
+     * How groups are sized after a drop on a group's edge: `split` (default)
+     * halves the target group, `distribute` shares the row or column evenly.
      */
     dropSizing?: 'split' | 'distribute';
     // #end dnd
